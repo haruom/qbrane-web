@@ -1,7 +1,26 @@
 import Image from "next/image";
+import { SignInButton } from "./signin";
 
+/*
+ * ここをランディングページとする？
+ * - サービスの説明
+ * - 「利用する」ボタン
+ *   - ヘッダにある
+ *   - Ouraリングの認証要求ページに飛ぶ
+ *   - 認証済みの場合、「マイページ」ボタンに変わる
+ */
 export default function Home() {
-  return (
+
+  return (<>
+    <header className="bg-black">
+      <nav className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8" aria-label="Global">
+        <div className="flex lg:flex-1">ロゴ画像</div>
+        <div className="flex">ページ内コンテンツのセクション</div>
+        <div className="hidden lg:flex lg:flex-1 lg:justify-end">
+          <SignInButton />
+        </div>
+      </nav>
+    </header>
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
         <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
@@ -109,5 +128,5 @@ export default function Home() {
         </a>
       </div>
     </main>
-  );
+  </>);
 }
