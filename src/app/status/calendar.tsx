@@ -40,7 +40,9 @@ export default function Calendar({ totalScore, data }: CalendarProps) {
     return (<Day key={day} {...({ day, data: data[day], isToday})} />);
   });
   return (<>
-    <h3 className="text-white text-center">{`今月の合計スコア: ${totalScore}`}</h3>
+    <h3 className="text-center">{`今月の合計スコア: ${totalScore}`}</h3>
+    <details>
+    <summary className="text-center">1ヶ月の睡眠時間</summary>
     <div className="lg:w-7/12 md:w-9/12 sm:w-10/12 mx-auto p-4">
         <div className="bg-white shadow-lg rounded-lg overflow-hidden text-black">
             <div className="flex items-center justify-between px-6 py-3 bg-gray-700">
@@ -55,6 +57,7 @@ export default function Calendar({ totalScore, data }: CalendarProps) {
             </div>
         </div>
     </div>
+    </details>    
   </>);
 }
 
