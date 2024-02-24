@@ -1,13 +1,13 @@
 import { logoutAndGoHome } from "@/lib/next-auth/auth";
 import { dailySleep, sleep } from "@/lib/oura/client";
 import Calendar, { CalendarProps } from "./calendar";
-import Worldcoin, { WorldcoinProps } from "./worldcoin";
+import Token, { } from "./token";
 
 export default async function Page() {
   try {
     const [totalScore, data] = await getCalenderProps();
     return (<>
-      <Worldcoin />
+      <Token />
       <Calendar totalScore={totalScore} data={data} />
     </>);
   } catch (e) {
