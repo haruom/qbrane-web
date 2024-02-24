@@ -2,13 +2,15 @@ import { logoutAndGoHome } from "@/lib/next-auth/auth";
 import { dailySleep, sleep } from "@/lib/oura/client";
 import Calendar, { CalendarProps } from "./calendar";
 import Token, { } from "./token";
+import Image from "next/image"
 
 export default async function Page() {
   try {
     const [totalScore, data] = await getCalenderProps();
     return (<>
-      <Token />
+      <Image src="/SleepinWhite.svg" alt="sleepin white" className="m-5" width={100} height={100} />
       <Calendar totalScore={totalScore} data={data} />
+      <Token />
     </>);
   } catch (e) {
     console.error(e);

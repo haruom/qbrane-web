@@ -40,7 +40,6 @@ export default function Calendar({ totalScore, data }: CalendarProps) {
     return (<Day key={day} {...({ day, data: data[day], isToday})} />);
   });
   return (<>
-    <div className="h-20"></div>
     <h3 className="text-center">{`今月の合計スコア: ${totalScore}`}</h3>
     <details>
     <summary className="text-center">1ヶ月の睡眠時間</summary>
