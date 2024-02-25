@@ -35,8 +35,9 @@ const Dialog = () => {
       <h2 className="text-center mt-3">取引履歴</h2>
       {/* <details>
         <summary className="text-center">過去の取引</summary> */}
-        <div className="overflow-auto max-h-48 lg:w-7/12 md:w-9/12 sm:w-10/12 mx-auto p-4">
-          <table className="min-w-full divide-y divide-gray-200 rounded-lg">
+      <div className="p-3">
+        <div className="overflow-auto max-h-48 lg:w-7/12 md:w-9/12 sm:w-10/12 mx-auto rounded-lg">
+          <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
                 <th className="text-white px-6 py-3 text-left text-xs font-medium uppercase tracking-wider bg-gray-700">
@@ -57,10 +58,11 @@ const Dialog = () => {
             </tbody>
           </table>
         </div>
-        {/* </details> */}
+      </div>
+      {/* </details> */}
       <dialog className="bg-white p-5 rounded-lg shadow-lg text-center" ref={dialog}>
         <button onClick={cancelHandler} type="button"
-        className="absolute top-0 right-0 mt-2 mr-2 bg-red-500 p-2 rounded-full font-bold text-white">
+          className="absolute top-0 right-0 mt-2 mr-2 bg-red-500 p-2 rounded-full font-bold text-white">
           X
         </button>
         <div className="mt-4">
@@ -76,9 +78,9 @@ const Dialog = () => {
       <h2 className="text-center">売り出し中: {currentAmount} MATIC</h2>
       <h2 className="text-center">もらえる金額: {currentAmount} MATIC</h2>
       <div className="text-center m-3">
-        <button type="button" 
-        className='bg-blue-500 p-3 rounded-full font-bold text-white hover:bg-blue-700 transition duration-300'
-        onClick={openHandler}>
+        <button type="button"
+          className='bg-blue-500 p-3 rounded-full font-bold text-white hover:bg-blue-700 transition duration-300'
+          onClick={openHandler}>
           受け取る
         </button>
       </div>
