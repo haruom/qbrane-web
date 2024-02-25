@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { SignInButton } from "./signin";
 import { signIn } from "next-auth/react";
+import Link from "next/link";
 
 /*
  * ここをランディングページとする？
@@ -62,7 +63,7 @@ export default function Home() {
       </div>
 
       <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <button
+        {/* <button
           onClick={() => { signIn('oura'); }}
           className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
           rel="noopener noreferrer"
@@ -76,10 +77,10 @@ export default function Home() {
           <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
             Demo for user.
           </p>
-        </button>
+        </button> */}
 
-        <button
-          onClick={() => { signIn('oura'); }}
+        {/* <button
+          onClick={() => { signIn('oura', { callbackUrl: "/lab/search" }); }}
           className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
           rel="noopener noreferrer"
         >
@@ -92,7 +93,7 @@ export default function Home() {
           <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
             Demo for lab.
           </p>
-        </button>
+        </button> */}
 
         <button
           onClick={() => { signIn('oura', { callbackUrl: "/status" }); }}
@@ -110,8 +111,7 @@ export default function Home() {
           </p>
         </button>
 
-        <button
-          onClick={() => { signIn('oura'); }}
+        <Link href="/lab/search" 
           className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
           rel="noopener noreferrer"
         >
@@ -121,10 +121,10 @@ export default function Home() {
               -&gt;
             </span>
           </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50 text-balance`}>
+          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
             login as lab.
           </p>
-        </button>
+        </Link>
       </div>
     </main>
   </>);
