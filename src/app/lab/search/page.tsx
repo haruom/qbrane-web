@@ -1,6 +1,7 @@
 'use client'
 import React, { useState } from 'react';
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Page() {
     const [showResult, setShowResult] = useState(false);
@@ -53,6 +54,9 @@ export default function Page() {
 
   return (
     <>
+      <a href="../" className="m-5">
+        <img src="/Sleepin.svg" alt="sleepin" width={100} height={100} />
+      </a>
       <h1 className="text-3xl text-center m-5">Search</h1>
       <p className="text-center m-3">日時</p>
       <div className="flex justify-center m-3">

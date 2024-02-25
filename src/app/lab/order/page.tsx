@@ -19,6 +19,9 @@ export default function Page() {
       }
     return (
         <>
+      <a href="../" className="m-5">
+        <img src="/Sleepin.svg" alt="sleepin" width={100} height={100} />
+      </a>
         <h1 className="text-3xl text-center m-5">Order</h1>
         <p className="text-center m-3">送金先アドレス</p>
         <div className="flex justify-center items-center m-3">
