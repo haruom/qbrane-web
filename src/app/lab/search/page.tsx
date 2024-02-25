@@ -58,11 +58,11 @@ export default function Page() {
         <img src="/Sleepin.svg" alt="sleepin" width={100} height={100} />
       </a>
       <h1 className="text-3xl text-center m-5">Search</h1>
-      <p className="text-center m-3">日時</p>
+      <p className="text-center m-3">睡眠データ取得日時</p>
       <div className="flex justify-center m-3">
-        <input type="date" className="w-1/3 mx-auto" value={startDate} onChange={e => setStartDate(e.target.value)}/>
-        <span className="mx-3">〜</span>
-        <input type="date" className="w-1/3 mx-auto" value={endDate} onChange={e => setEndDate(e.target.value)}/>
+        <input type="date" className="w-3/7 mx-auto" value={startDate} onChange={e => setStartDate(e.target.value)}/>
+        <span className="mx-1">〜</span>
+        <input type="date" className="w-3/7 mx-auto" value={endDate} onChange={e => setEndDate(e.target.value)}/>
       </div>
       <div className="flex justify-center m-3">
         {aleart && <p className="text-red-500">{aleart}</p>}
@@ -75,7 +75,7 @@ export default function Page() {
         <>
           <p className="text-center m-3">結果</p>
           <div className="flex justify-center m-3">
-            <table className="table-auto">
+            <table className="table-auto border-separate">
               <thead>
                 <tr>
                   <th className="border px-4 py-2">人数</th>
@@ -85,9 +85,9 @@ export default function Page() {
               </thead>
               <tbody>
                 <tr>
-                  <td className="border px-4 py-2">1000</td>
-                  <td className="border px-4 py-2">{days}</td>
-                  <td className="border px-4 py-2">{amount}</td>
+                  <td className="border px-4 py-2 text-center">1000</td>
+                  <td className="border px-4 py-2 text-center">{days}</td>
+                  <td className="border px-4 py-2 text-center">{amount}</td>
                 </tr>
               </tbody>
             </table>
