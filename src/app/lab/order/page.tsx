@@ -73,7 +73,7 @@ export default function WalletInteraction() {
       const txParams = {
         from: account,
         to: '0x32cc368b24789d033d95a101da99667c6e94c4a2',
-        value: '0x150000000000000',
+        value: '0x150000000000',
         gasPrice: '0x0',
       };
 
@@ -82,6 +82,17 @@ export default function WalletInteraction() {
         params: [txParams],
       });
       console.log('Estimated Gas:', estimatedGas);
+
+      const txHash = await provider.request({
+        method: 'eth_sendTransaction',
+        params: [
+          {
+            from: account,
+            to: '0x32cc368b24789d033d95a101da99667c6e94c4a2',
+            value: '0x150000000000',
+          }
+        ],
+      });
 
       // const txHash = await provider.request({
       //   method: 'eth_sendTransaction',
