@@ -10,21 +10,43 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Account {
-  id                 String  @id @default(cuid())
-  userId             String
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String?  @db.Text
-  access_token       String?  @db.Text
-  expires_at         Int?
-  token_type         String?
-  scope              String?
-  id_token           String?  @db.Text
-  session_state      String?
+model Record {
+  id            Int             @id @default(autoincrement())
+  userId        String
+  type          RecordEventType
+  amount        BigInt
+  recordedAt    DateTime        @default(now())
+  sleepDuration Int?
+  sleepDate     DateTime?       @db.Date
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+model EncryptedSleepData {
+  id              String   @id @default(cuid())
+  userId          String
+  date            DateTime @db.Date
+  transactionHash String
+  keyStr          String
+  ivStr           String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -38,13 +60,15 @@ model Session {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  accounts      Account[]
-  sessions      Session[]
+  id                 String               @id @default(cuid())
+  name               String?
+  email              String?              @unique
+  emailVerified      DateTime?
+  image              String?
+  accounts           Account[]
+  EncryptedSleepData EncryptedSleepData[]
+  Record             Record[]
+  sessions           Session[]
 }
 
 model VerificationToken {
@@ -55,3 +79,8 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+enum RecordEventType {
+  SLEEP
+  SELLDATA
+  WITHDRAW
+}
