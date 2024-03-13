@@ -1,24 +1,48 @@
 'use client'
-import { useRef, useState, useEffect } from "react"
+import { bigint2Float } from "@/lib/reward/reward"
+import { RecordEventType } from "@prisma/client"
+import { useRef, useState } from "react"
 
-const Dialog = () => {
-  const [amount, setAmount] = useState(10)
-  const [currentAmount, setCurrentAmount] = useState(10)
-  const [tableData, setTableData] = useState<{ date: string; count: number; }[]>([]);
+interface Record {
+  type: RecordEventType
+  amount: bigint
+  sleepDuration: number | null
+  sleepDate: Date | null
+  recordedAt: Date
+}
+interface Props {
+  records: Record[]
+}
+const Dialog = ({ records }: Props) => {
+  const [amount, setAmount_] = useState(10)
+  const setAmount = (v_: number) => {
+    const v = Number.isNaN(v_) ? 0 : v_
+    setAmount_(v);
+  }
+  const tableData = records.map(x => {
+    const { type, amount: amount_, recordedAt } = x
+    const amount = bigint2Float(amount_)
+
+    switch (type) {
+      case 'SELLDATA':
+        return { date: recordedAt, detail: '睡眠データの売却', amount };
+      case 'WITHDRAW':
+        return { date: recordedAt, detail: '引き出し', amount };
+      case 'SLEEP':
+        if (!x.sleepDuration || !x.sleepDate) { throw '必要なデータが欠落しています'; }
+        const hour = Math.floor(x.sleepDuration / 3600)
+        const minute = Math.floor((x.sleepDuration - (hour * 3600)) / 60)
+        const detail = `${hour}h${minute}m の睡眠`;
+        return { date: x.sleepDate, detail, amount }
+    }
+  })
+    .sort((a, b) => b.date.getTime() - a.date.getTime())
+    .map(({ date, ...rest }) => ({ date: date.toISOString().substring(0, 10), ...rest }))
   const dialog = useRef<HTMLDialogElement>(null)
-
-  useEffect(() => {
-    // ダミーデータを生成
-    const data = Array.from({ length: 10 }, () => ({
-      date: new Date().toISOString().split('T')[0],
-      count: Math.floor(Math.random() * 100) + 1,
-    }));
-    setTableData(data);
-  }, []);
 
   const openHandler = () => {
     dialog.current?.showModal()
-    setAmount(currentAmount)
+    setAmount(amount)
   }
 
   const cancelHandler = () => {
@@ -27,7 +51,7 @@ const Dialog = () => {
 
   const closeHandler = () => {
     dialog.current?.close()
-    setCurrentAmount(currentAmount - amount)
+    location.reload()
   }
 
   return (
@@ -40,19 +64,23 @@ const Dialog = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="text-white px-6 py-3 text-left text-xs font-medium uppercase tracking-wider bg-gray-700">
+                <th className="text-white px-4 py-3 text-left text-xs font-medium uppercase tracking-wider bg-gray-700">
                   日付
                 </th>
-                <th className="text-white px-6 py-3 text-left text-xs font-medium uppercase tracking-wider bg-gray-700">
-                  個数
+                <th className="text-white px-4 py-3 text-left text-xs font-medium uppercase tracking-wider bg-gray-700">
+                  詳細
+                </th>
+                <th className="text-white px-4 py-3 text-left text-xs font-medium uppercase tracking-wider bg-gray-700">
+                  金額
                 </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {tableData.map((row, index) => (
                 <tr key={index}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-black">{row.date}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-black">{row.count}</td>
+                  <td className="px-4 py-4 whitespace-nowrap text-sm text-black">{row.date}</td>
+                  <td className="px-4 py-4 whitespace-nowrap text-sm text-black">{row.detail}</td>
+                  <td className="px-4 py-4 whitespace-nowrap text-sm text-black">{row.amount} MATIC</td>
                 </tr>
               ))}
             </tbody>
@@ -67,7 +95,7 @@ const Dialog = () => {
         </button>
         <div className="mt-4">
           <p>受け取り先</p>
-          <input type="text" className="w-2/4 p-3 rounded-lg border" placeholder="123456789" />
+          <input type="text" className="w-2/4 p-3 rounded-lg border" placeholder="0x..." />
           <p>受け取り額</p>
           <input type="number" className="w-2/4 p-3 rounded-lg border" value={amount} onChange={(e) => setAmount(parseInt(e.target.value))} />
           <button onClick={closeHandler} type="button" className="bg-blue-500 p-3 rounded-full font-bold text-white mt-4 hover:bg-blue-700 transition duration-300">
@@ -75,8 +103,6 @@ const Dialog = () => {
           </button>
         </div>
       </dialog>
-      <h2 className="text-center">売り出し中: {currentAmount} MATIC</h2>
-      <h2 className="text-center">もらえる金額: {currentAmount} MATIC</h2>
       <div className="text-center m-3">
         <button type="button"
           className='bg-blue-500 p-3 rounded-full font-bold text-white hover:bg-blue-700 transition duration-300'

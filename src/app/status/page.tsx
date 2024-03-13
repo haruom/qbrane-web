@@ -1,16 +1,16 @@
-import { logoutAndGoHome } from "@/lib/next-auth/auth";
-import { dailySleep, sleep } from "@/lib/oura/client";
-import Calendar, { CalendarProps } from "./calendar";
+import { getUserId, logoutAndGoHome } from "@/lib/next-auth/auth";
 import Token, { } from "./token";
 import Image from "next/image"
+import { PrismaClient } from "@prisma/client";
+import { bigint2Float } from "@/lib/reward/reward";
 
 export default async function Page() {
   try {
-    const [totalScore, data] = await getCalenderProps();
+    const { records, balance } = await getProps();
     return (<>
       <Image src="/SleepinWhite.svg" alt="sleepin white" className="m-5" width={100} height={100} />
-      <Calendar totalScore={totalScore} data={data} />
-      <Token />
+      <h3 className="text-center">{`残高: ${balance} MATIC`}</h3>
+      <Token records={records} />
     </>);
   } catch (e) {
     console.error(e);
@@ -18,32 +18,16 @@ export default async function Page() {
   }
 }
 
-async function getCalenderProps() {
-  const startDate = ((d) => { d.setDate(1); return d })(new Date());
-  const endDate = new Date();
-  const dailySleepData = await dailySleep(startDate, endDate);
-  const sleepData = await sleep(startDate, endDate);
+async function getProps() {
+  const userId = await getUserId()
+  const prisma = new PrismaClient();
+  const records_ = await prisma.record.findMany({
+    where: { userId }
+  })
+  await prisma.$disconnect()
+  const records = records_.map(({ userId, id, ...rest }) => rest) // 不要な情報を取り除く
 
-  let totalScore = 0;
-  const data = dailySleepData.data.reduce(
-    (acc, d) => {
-      const day = parseInt(d.day.slice(-2));
-      const score = d.score ?? 0;
-      totalScore += score;
-
-      // 1日の合計睡眠時間 (単位: 秒)
-      const total_sleep_duration = sleepData.data
-        .filter(x => x.day === d.day)
-        .reduce((acc, x) => acc + x.total_sleep_duration, 0)
-      const totalMinute = Math.floor(total_sleep_duration / 60);
-      const minute = totalMinute % 60;
-      const hour = (totalMinute - minute) / 60;
-      const totalSleepTime = { hour, minute };
-      acc[day] = { score, totalSleepTime };
-      return acc;
-    },
-    {} as CalendarProps['data']
-  );
-
-  return [totalScore, data] as const;
+  const balance_ = records.reduce((acc, { amount }) => acc + amount, BigInt(0))
+  const balance = bigint2Float(balance_)
+  return { records, balance }
 }
