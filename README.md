@@ -18,15 +18,15 @@ SleePINは睡眠を正確に計測できる「Ouraリング」と呼ばれるウ
 
 ### ウェブアプリデモ
 
-<img src="./SleePIN_login.png" width="50%">
+<img src="./SleePIN_login.png" width="30%">
 
 睡眠データによる報酬獲得
 
-<img src="./SleePIN_main.png" width="50%">
+<img src="./SleePIN_main.png" width="30%">
 
 獲得トークンの引き出し
 
-<img src="./SleePIN_withdrawal.png" width="50%">
+<img src="./SleePIN_withdrawal.png" width="30%">
 
 ### 睡眠データの保存
 
