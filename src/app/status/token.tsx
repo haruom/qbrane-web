@@ -15,8 +15,10 @@ interface Record {
 }
 interface Props {
   records: Record[]
+  earnSum: number
+  withdrawSum: number
 }
-const Dialog = ({ records }: Props) => {
+const Dialog = ({ records, earnSum, withdrawSum }: Props) => {
   const buttonClass = "bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded";
   const { sdk, connected, connecting, provider, account } = useSDK();
   console.info({ sdk, connected, connecting, provider, chainId })
@@ -63,7 +65,26 @@ const Dialog = ({ records }: Props) => {
   };
 
   const [amountStr, setAmountStr] = useState('0.01')
-  const tableData = records.map(x => {
+  const sleepTableData = records.filter(x => x.type === 'SLEEP').map(x => {
+    const { type, amount: amount_, recordedAt } = x
+    const amount = bigint2Float(amount_)
+
+    switch (type) {
+      case 'SELLDATA':
+        return { date: recordedAt, detail: '睡眠データの売却', amount };
+      case 'WITHDRAW':
+        return { date: recordedAt, detail: '引き出し', amount };
+      case 'SLEEP':
+        if (!x.sleepDuration || !x.sleepDate) { throw '必要なデータが欠落しています'; }
+        const hour = Math.floor(x.sleepDuration / 3600)
+        const minute = Math.floor((x.sleepDuration - (hour * 3600)) / 60)
+        const detail = `${hour}h${minute}m の睡眠`;
+        return { date: x.sleepDate, detail, amount }
+    }
+  })
+    .sort((a, b) => b.date.getTime() - a.date.getTime())
+    .map(({ date, ...rest }) => ({ date: date.toISOString().substring(0, 10), ...rest }))
+  const withdrawTableData = records.filter(x => x.type === 'WITHDRAW').map(x => {
     const { type, amount: amount_, recordedAt } = x
     const amount = bigint2Float(amount_)
 
@@ -125,7 +146,7 @@ const Dialog = ({ records }: Props) => {
           className={buttonClass}
           onClick={addNetwork}>Polygon Amoy Testnetをウォレットに追加</button>
       </div>
-      <h2 className="text-center mt-3">取引履歴</h2>
+      <h2 className="px-3 mt-3">{`睡眠獲得報酬: ${earnSum} MATIC`}</h2>
       {/* <details>
         <summary className="text-center">過去の取引</summary> */}
       <div className="p-3">
@@ -145,7 +166,38 @@ const Dialog = ({ records }: Props) => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {tableData.map((row, index) => (
+              {sleepTableData.map((row, index) => (
+                <tr key={index}>
+                  <td className="px-4 py-4 whitespace-nowrap text-sm text-black">{row.date}</td>
+                  <td className="px-4 py-4 whitespace-nowrap text-sm text-black">{row.detail}</td>
+                  <td className="px-4 py-4 whitespace-nowrap text-sm text-black">{row.amount} MATIC</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <h2 className="px-3 mt-3">{`引き出し済み: ${withdrawSum} MATIC`}</h2>
+      {/* <details>
+        <summary className="text-center">過去の取引</summary> */}
+      <div className="p-3">
+        <div className="overflow-auto max-h-48 lg:w-7/12 md:w-9/12 sm:w-10/12 mx-auto rounded-lg">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="text-white px-4 py-3 text-left text-xs font-medium uppercase tracking-wider bg-gray-700">
+                  日付
+                </th>
+                <th className="text-white px-4 py-3 text-left text-xs font-medium uppercase tracking-wider bg-gray-700">
+                  詳細
+                </th>
+                <th className="text-white px-4 py-3 text-left text-xs font-medium uppercase tracking-wider bg-gray-700">
+                  金額
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {withdrawTableData.map((row, index) => (
                 <tr key={index}>
                   <td className="px-4 py-4 whitespace-nowrap text-sm text-black">{row.date}</td>
                   <td className="px-4 py-4 whitespace-nowrap text-sm text-black">{row.detail}</td>
