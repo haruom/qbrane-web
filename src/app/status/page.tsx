@@ -1,49 +1,28 @@
 import { logoutAndGoHome } from "@/lib/next-auth/auth";
-import { dailySleep, sleep } from "@/lib/oura/client";
-import Calendar, { CalendarProps } from "./calendar";
 import Token, { } from "./token";
 import Image from "next/image"
+import { bigint2Float, getRewardState } from "@/lib/reward/reward";
 
 export default async function Page() {
   try {
-    const [totalScore, data] = await getCalenderProps();
+    const { records, balance } = await getRewardState();
+    const earnSum_ = records
+      .filter(x => x.type === 'SLEEP')
+      .map(x => x.amount)
+      .reduce((a, b) => a + b, BigInt(0))
+    const withdrawSum_ = records
+      .filter(x => x.type === 'WITHDRAW')
+      .map(x => x.amount)
+      .reduce((a, b) => a + b, BigInt(0))
+    const earnSum = bigint2Float(earnSum_)
+    const withdrawSum = bigint2Float(withdrawSum_)
     return (<>
       <Image src="/SleepinWhite.svg" alt="sleepin white" className="m-5" width={100} height={100} />
-      <Calendar totalScore={totalScore} data={data} />
-      <Token />
+      <h3 className="text-center">{`残高: ${balance} MATIC`}</h3>
+      <Token records={records} earnSum={earnSum} withdrawSum={withdrawSum} />
     </>);
   } catch (e) {
     console.error(e);
     await logoutAndGoHome();
   }
-}
-
-async function getCalenderProps() {
-  const startDate = ((d) => { d.setDate(1); return d })(new Date());
-  const endDate = new Date();
-  const dailySleepData = await dailySleep(startDate, endDate);
-  const sleepData = await sleep(startDate, endDate);
-
-  let totalScore = 0;
-  const data = dailySleepData.data.reduce(
-    (acc, d) => {
-      const day = parseInt(d.day.slice(-2));
-      const score = d.score ?? 0;
-      totalScore += score;
-
-      // 1日の合計睡眠時間 (単位: 秒)
-      const total_sleep_duration = sleepData.data
-        .filter(x => x.day === d.day)
-        .reduce((acc, x) => acc + x.total_sleep_duration, 0)
-      const totalMinute = Math.floor(total_sleep_duration / 60);
-      const minute = totalMinute % 60;
-      const hour = (totalMinute - minute) / 60;
-      const totalSleepTime = { hour, minute };
-      acc[day] = { score, totalSleepTime };
-      return acc;
-    },
-    {} as CalendarProps['data']
-  );
-
-  return [totalScore, data] as const;
 }

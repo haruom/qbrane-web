@@ -5,8 +5,13 @@ const prisma = new PrismaClient();
 
 const baseUrl = 'https://api.ouraring.com/v2/usercollection/';
 
-async function call<ResponseData>(url: string) {
-  const access_token = await getToken();
+/**
+ * OuraのAPIにリクエストを飛ばす部分を共通化したもの
+ * @param accountId 開発用
+ * @returns 
+ */
+async function call<ResponseData>(url: string, accountId?: string) {
+  const access_token = await getToken(accountId);
 
   const res = await fetch(url, {
     method: 'GET',
@@ -59,8 +64,9 @@ export async function dailySleep(startDate: Date, endDate: Date) {
  * 睡眠データを取得。
  * 情報は細かく、昼寝は独立した睡眠としてカウントされる。
  * https://cloud.ouraring.com/v2/docs#tag/Sleep-Routes
+ * @param accountId 開発用
  */
-export async function sleep(startDate: Date, endDate: Date) {
+export async function sleep(startDate: Date, endDate: Date, accountId?: string) {
   const start_date = toDateStr(startDate);
   const end_date = toDateStr(endDate);
   const url = `${baseUrl}sleep?start_date=${start_date}&end_date=${end_date}`
@@ -106,7 +112,7 @@ export async function sleep(startDate: Date, endDate: Date) {
     }>
     next_token?: string
   };
-  const data = await call<ResponseData>(url);
+  const data = await call<ResponseData>(url, accountId);
 
   return data;
 }
@@ -115,9 +121,15 @@ export async function sleep(startDate: Date, endDate: Date) {
 
 const authBaseUrl = 'https://api.ouraring.com/';
 
-async function getToken() {
+/**
+ * ログインセッションのユーザIDからOuraのアクセストークンを取得する。期限切れの場合はトークンの更新処理もする
+ * @param accountId 開発用に使う。指定されたIDのアクセストークンを返すようになる
+ */
+async function getToken(accountId?: string) {
   const userId = await getUserId();
-  const account = await findOuraAccountByUserId(userId);
+  const account = !accountId
+    ? await findOuraAccountByUserId(userId)
+    : await prisma.account.findFirst({ where: { providerAccountId: accountId, provider: 'oura' }})
 
   if (!account) {
     throw "Oura アカウントとの連携を許可する必要があります";

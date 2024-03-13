@@ -4,6 +4,7 @@ import Image from "next/image";
 import { SignInButton } from "./signin";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
 /*
  * ここをランディングページとする？
@@ -96,7 +97,8 @@ export default function Home() {
         </button> */}
 
         <button
-          onClick={() => { signIn('oura', { callbackUrl: "/status" }); }}
+          // onClick={() => { signIn('oura', { callbackUrl: "/status" }); }}
+          onClick={() => { redirect('/status'); }}
           className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
           rel="noopener noreferrer"
         >
