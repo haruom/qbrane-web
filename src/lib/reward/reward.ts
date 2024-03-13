@@ -1,3 +1,26 @@
+import { PrismaClient } from "@prisma/client";
+import { getUserId } from "../next-auth/auth";
+
+export async function getRewardState(userId?: string) {
+  if (!userId) {
+    userId = await getUserId()
+  }
+  // const userId = 'clsqew4kb0016luu6k8jtwwld';
+  const prisma = new PrismaClient();
+  const records_ = await prisma.record.findMany({
+    where: { userId }
+  })
+  await prisma.$disconnect()
+  const records = records_.map(({ userId, id, ...rest }) => rest) // 不要な情報を取り除く
+
+  const balance_ = records.reduce((acc, { amount }) => acc + amount, BigInt(0))
+  const balance = bigint2Float(balance_)
+  return { records, balance }
+}
+
+export function matic2Finney(v: number) {
+  return Math.round(v * 1000);
+}
 
 /**
  * 睡眠データの報酬(MATIC)は下記の合計 (1+2) とする
@@ -11,7 +34,7 @@ export function calcAmount(sleepData: { total_sleep_duration: number }[]) {
   const x = sleepDuration / 60 / 60; // 時間(hour)に換算
   const base = 0.5; // 睡眠データ素点
   const bonus = 0.5 * (1 - (Math.E ** (-0.5 * x))) // 睡眠時間ボーナス
-  const amount = Math.floor((base + parseFloat(bonus.toFixed(3))) * 1000);
+  const amount = matic2Finney(base + parseFloat(bonus.toFixed(3)));
   return { sleepDuration, amount };
 }
 

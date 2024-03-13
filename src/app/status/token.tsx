@@ -28,7 +28,7 @@ const Dialog = ({ records }: Props) => {
       params: [{
         chainId,
         chainName: 'Polygon Amoy Testnet',
-        rpcUrls: ['https://rpc-amoy.polygon.technology/'],
+        rpcUrls: [process.env.NEXT_PUBLIC_POLYGON_RPC_URL],
         nativeCurrency: {
           name: 'MATIC',
           symbol: 'MATIC',
@@ -62,11 +62,7 @@ const Dialog = ({ records }: Props) => {
     setUserAddress(accounts[0]);
   };
 
-  const [amount, setAmount_] = useState(10)
-  const setAmount = (v_: number) => {
-    const v = Number.isNaN(v_) ? 0 : v_
-    setAmount_(v);
-  }
+  const [amountStr, setAmountStr] = useState('0.01')
   const tableData = records.map(x => {
     const { type, amount: amount_, recordedAt } = x
     const amount = bigint2Float(amount_)
@@ -90,16 +86,35 @@ const Dialog = ({ records }: Props) => {
 
   const openHandler = () => {
     dialog.current?.showModal()
-    setAmount(amount)
   }
 
   const cancelHandler = () => {
     dialog.current?.close()
   }
 
-  const closeHandler = () => {
-    dialog.current?.close()
-    location.reload()
+  const closeHandler = async () => {
+    const amount = parseFloat(amountStr)
+    if (isNaN(amount) || amount < 0) {
+      alert('受け取り額の値が不正です');
+      return
+    }
+    const res = await fetch('/api/user/withdraw', {
+      method: 'POST',
+      mode: 'same-origin',
+      credentials: 'same-origin',
+      body: JSON.stringify({ address: userAddress, amount: amount }),
+    })
+    const text = await res.text()
+    if (res.status !== 200) {
+      alert('MATICの送付に失敗したかも');
+      if (text !== '') { alert(JSON.parse(text).message); }
+      return
+    } else {
+      alert('MATICの送付に成功しました')
+      dialog.current?.close()
+      location.reload()
+      return
+    }
   }
 
   return (
@@ -157,10 +172,10 @@ const Dialog = ({ records }: Props) => {
           </div>
           <p>受け取り額</p>
           <div className="flex px-10">
-            <input type="number" className="grow w-2/4 p-3 rounded-lg border" value={amount} onChange={(e) => setAmount(parseInt(e.target.value))} />
+            <input type="number" className="grow w-2/4 p-3 rounded-lg border" value={amountStr} onChange={(e) => setAmountStr(e.target.value)} />
           </div>
           <button onClick={closeHandler} type="button" className="bg-blue-500 p-3 rounded-full font-bold text-white mt-4 hover:bg-blue-700 transition duration-300">
-            {amount} MATIC受け取る
+            受け取る
           </button>
         </div>
       </dialog>
