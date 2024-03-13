@@ -3,7 +3,7 @@
 # SleePIN
 
 ![SleePIN_concept.png](./SleePIN_concept.png)
-
+<img src="./SleePIN_concept.png" width="50%">
 Githubレポジトリ：[https://github.com/haruom/qbrane-web](https://github.com/haruom/qbrane-web)
 
 デモアプリ：[https://duckling-electric-snake.ngrok-free.app/status](https://duckling-electric-snake.ngrok-free.app/status)
