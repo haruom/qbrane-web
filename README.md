@@ -18,17 +18,14 @@ SleePINは睡眠を正確に計測できる「Ouraリング」と呼ばれるウ
 
 ### ウェブアプリデモ
 
-![SleePIN_login.png](./SleePIN_login.png)
 <img src="./SleePIN_login.png" width="50%">
 
 睡眠データによる報酬獲得
 
-![Screenshot 2024-03-13 at 21.29.27.png](./SleePIN_main.png)
 <img src="./SleePIN_main.png" width="50%">
 
 獲得トークンの引き出し
 
-![SleePIN_withdrawal.png](./SleePIN_withdrawal.png)
 <img src="./SleePIN_withdrawal.png" width="50%">
 
 ### 睡眠データの保存
@@ -52,5 +49,4 @@ Ouraリングを装着して睡眠するだけで、睡眠時間に応じたト�
 1. 睡眠データ素点：0.5 (MATIC)
 2. 睡眠時間ボーナスの計算式：y=0.5*(1−e ^−0.5x) (MATIC)
 
-![reward_figure.png](./reward_figure.png)
 <img src="./reward_figure.png" width="50%">
