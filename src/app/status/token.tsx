@@ -2,6 +2,9 @@
 import { bigint2Float } from "@/lib/reward/reward"
 import { RecordEventType } from "@prisma/client"
 import { useRef, useState } from "react"
+import { MetaMaskProvider, useSDK } from "@metamask/sdk-react";
+
+const chainId = process.env.NEXT_PUBLIC_POLYGON_CHAIN_ID;
 
 interface Record {
   type: RecordEventType
@@ -14,6 +17,51 @@ interface Props {
   records: Record[]
 }
 const Dialog = ({ records }: Props) => {
+  const buttonClass = "bg-transparent hover:bg-blue-500 text-blue-700 font-semibold hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded";
+  const { sdk, connected, connecting, provider, account } = useSDK();
+  console.info({ sdk, connected, connecting, provider, chainId })
+  const addNetwork = async () => {
+    if (!provider?.isConnected()) { await sdk?.connect() }
+
+    await provider?.request({
+      method: 'wallet_addEthereumChain',
+      params: [{
+        chainId,
+        chainName: 'Polygon Amoy Testnet',
+        rpcUrls: ['https://rpc-amoy.polygon.technology/'],
+        nativeCurrency: {
+          name: 'MATIC',
+          symbol: 'MATIC',
+          decimals: 18,
+        },
+        blockExplorerUrls: ['https://www.oklink.com/amoy'],
+      }],
+    })
+    await provider?.request({
+      method: 'wallet_switchEthereumChain',
+      params: [{ chainId }]
+    })
+  }
+
+  const [userAddress, setUserAddress] = useState(account ?? '')
+  const requestAccount = async () => {
+    if (!provider?.isConnected()) { await sdk?.connect() }
+    await provider?.request({
+      method: 'wallet_switchEthereumChain',
+      params: [{ chainId }]
+    })
+    const accounts = await provider?.request({
+      method: 'eth_requestAccounts'
+    }) as string[];
+
+    if (!accounts || accounts?.length <= 0) {
+      alert('アカウントを指定してください');
+      throw 'error';
+    }
+
+    setUserAddress(accounts[0]);
+  };
+
   const [amount, setAmount_] = useState(10)
   const setAmount = (v_: number) => {
     const v = Number.isNaN(v_) ? 0 : v_
@@ -56,6 +104,12 @@ const Dialog = ({ records }: Props) => {
 
   return (
     <>
+      <div className="flex flex-col justify-center px-3">
+        <p className="text-center text-red-700">※デモのため、受け取りにはPolygon Amoy Testnetのアカウントが必要です</p>
+        <button
+          className={buttonClass}
+          onClick={addNetwork}>Polygon Amoy Testnetをウォレットに追加</button>
+      </div>
       <h2 className="text-center mt-3">取引履歴</h2>
       {/* <details>
         <summary className="text-center">過去の取引</summary> */}
@@ -95,9 +149,16 @@ const Dialog = ({ records }: Props) => {
         </button>
         <div className="mt-4">
           <p>受け取り先</p>
-          <input type="text" className="w-2/4 p-3 rounded-lg border" placeholder="0x..." />
+          <div className="flex px-10">
+            <input type="text" className="grow w-2/4 p-3 rounded-lg border" value={userAddress} onChange={(e) => setUserAddress(e.target.value)} placeholder="0x..." />
+            <button className={buttonClass + ' shrink'} onClick={requestAccount}>
+              👛
+            </button>
+          </div>
           <p>受け取り額</p>
-          <input type="number" className="w-2/4 p-3 rounded-lg border" value={amount} onChange={(e) => setAmount(parseInt(e.target.value))} />
+          <div className="flex px-10">
+            <input type="number" className="grow w-2/4 p-3 rounded-lg border" value={amount} onChange={(e) => setAmount(parseInt(e.target.value))} />
+          </div>
           <button onClick={closeHandler} type="button" className="bg-blue-500 p-3 rounded-full font-bold text-white mt-4 hover:bg-blue-700 transition duration-300">
             {amount} MATIC受け取る
           </button>
@@ -114,4 +175,16 @@ const Dialog = ({ records }: Props) => {
   )
 }
 
-export default Dialog
+const Dialog_ = (props: Props) => (
+  <MetaMaskProvider
+    sdkOptions={{
+      dappMetadata: {
+        name: 'SleePIN',
+        url: process.env.NEXT_PUBLIC_APP_URL,
+      }
+    }}
+    >
+      <Dialog {...props}></Dialog>
+  </MetaMaskProvider>
+)
+export default Dialog_
