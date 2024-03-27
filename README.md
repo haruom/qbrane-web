@@ -17,16 +17,18 @@ Githubレポジトリ：[https://github.com/haruom/qbrane-web](https://github.co
 SleePINは睡眠を正確に計測できる「Ouraリング」と呼ばれるウェアラブルデバイスを身に付けて睡眠データを取得し、その睡眠データを睡眠研究機関に提供することで、ユーザーは報酬として仮想通貨（Polygon）を獲得できるアプリケーションである。睡眠研究機関は、その睡眠データを活用した研究を行い、睡眠の個人最適化システムなどのAI開発を行うことで、ユーザーへ対する健康利益を提供することができるようになる。
 
 ### ウェブアプリデモ
-
-<img src="./SleePIN_login.png" width="30%">
-
-睡眠データによる報酬獲得
-
-<img src="./SleePIN_main.png" width="30%">
-
-獲得トークンの引き出し
-
-<img src="./SleePIN_withdrawal.png" width="30%">
+<table>
+  <tr>
+    <td>ホーム画面</td>
+    <td>睡眠データによる報酬獲得</td>
+    <td>獲得トークンの引き出し</td>
+  </tr>
+  <tr>
+    <td><img src="./SleePIN_login.png" width="100%" alt="キャプション1"></td>
+    <td><img src="./SleePIN_main.png" width="100%" alt="キャプション2"></td>
+    <td><img src="./SleePIN_withdrawal.png" width="100%" alt="キャプション3"></td>
+  </tr>
+</table>
 
 ### 睡眠データの保存
 
